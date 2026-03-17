@@ -1,0 +1,16 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+  <h2>Test SMTP Configuration: {{ config.name }}</h2>
+
+  <form method="post">
+      {% csrf_token %}
+      <label>Send test email to:</label><br><br>
+      <input type="email" name="test_email" required style="width:300px;">
+      <br><br>
+      <button type="submit" class="default">Send Test Email</button>
+  </form>
+
+  <br>
+  <a href="../../{{ config.id }}/change/">Back</a>
+{% endblock %}

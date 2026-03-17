@@ -1,0 +1,228 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Quotation {{ quotation.code }}</title>
+    <style>
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #000;
+            margin: 30px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .logo {
+            width: 100px;
+            height: auto;
+            margin-right: 15px;
+        }
+        .company-info {
+            font-size: 11px;
+            line-height: 1.4;
+        }
+        .company-info p {
+            margin: 2px 0;
+        }
+        .quotation-info {
+            margin-left: auto;
+            text-align: right;
+            font-size: 12px;
+        }
+        .quotation-info strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Billing Section */
+        .billing-box {
+            border: 1px solid #ccc;      /* Outline */
+            border-radius: 8px;          /* Rounded corners */
+            background: #fff;            /* White background */
+            padding: 15px 20px;          /* Space inside */
+            margin-bottom: 20px;         /* Space below */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow */
+        }
+
+        .billing strong {
+            display: inline;             /* Keep labels and values inline */
+            color: #333;
+        }
+
+        .billing .row {
+            margin-bottom: 6px;          /* Space between lines */
+        }
+
+        /* Section Titles */
+        .section-title {
+            font-weight: bold;
+            border-bottom: 1px dashed #888;
+            margin-bottom: 8px;
+            padding-bottom: 4px;
+            color: #333;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+            font-size: 11px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        th, td {
+            padding: 8px 6px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background: #f3f3f3;
+            font-weight: bold;
+            text-align: left;
+        }
+        td.right {
+            text-align: right;
+        }
+        .total {
+            font-weight: bold;
+            border-top: 2px solid #333;
+        }
+
+        /* Signatures */
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            font-size: 11px;
+        }
+        .sign-block {
+            width: 30%;
+            text-align: center;
+            border-top: 1px solid #000;
+            padding-top: 6px;
+        }
+
+        /* Title */
+        .title {
+            text-align: center;
+            font-weight: bold;
+            margin: 20px 0;
+            font-size: 16px;
+            color: #222;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div style="text-align: center; margin-bottom: 25px;">
+    <img src="https://image2url.com/r2/default/images/1772914658173-c3b811fe-de04-4840-9a71-74c59ad4e855.png" alt="Company Logo" class="logo" style="width:70px; height:auto;" />
+    <p style="margin-top:8px; font-size:9px; font-style:italic; color:#555;">
+        Professionally Delivering Excellence
+    </p>
+</div>
+    <div class="company-info" style="margin-left: 20px;">
+        <p><strong>Texmon Logistics Limited</strong></p>
+        <p>Fidel Odinga Road off Nyali Links Road</p>
+        <p>P.O BOX 42627 80100</p>
+        <p>Contact: +254-795 616 827</p>
+        <p>Tax ID: P051812471I</p>
+        <p>Email: enquiries@texmonlogistics.co.ke</p>
+    </div>
+    <div class="quotation-info">
+        <strong>QUOTATION</strong>
+        <div># {{ quotation.code }}</div>
+        <div>Ref No: {{ quotation.file|default:"N/A" }}</div>
+        <div>Date: {{ quotation.created_at|date:"d/m/Y" }}</div>
+    </div>
+</div>
+
+<!-- Billing Section -->
+<!-- Billing Section -->
+ <div class="billing-box">
+<div class="billing" style="
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+">
+    <strong style="display:block; margin-bottom:10px; font-size:13px; color:#333;">Bill To:</strong>
+
+    <div style="display:flex; flex-wrap: wrap;">
+        <div style="width:50%; margin-bottom:6px;">Client: <strong>{{ quotation.client.name }}</strong></div>
+
+        {% if client_master %}
+            {% if client_master.PaymentTerm %}
+            <div style="width:50%; margin-bottom:6px;">Payment Term: <strong>{{ client_master.PaymentTerm }}</strong></div>
+            {% endif %}
+            {% if client_master.Currency %}
+            <div style="width:50%; margin-bottom:6px;">Currency: <strong>{{ client_master.Currency }}</strong></div>
+            {% endif %}
+            {% if client_master.Salesrep %}
+            <div style="width:50%; margin-bottom:6px;">Sales Rep: <strong>{{ client_master.Salesrep }}</strong></div>
+            {% endif %}
+        {% endif %}
+
+        {% if quotation.client.address %}
+        <div style="width:100%; margin-bottom:6px;">Address: <strong>{{ quotation.client.address }}</strong></div>
+        {% endif %}
+    </div>
+</div>
+</div>
+<!-- Items Section -->
+<div class="section">
+    <div class="section-title">Items</div>
+
+    <!-- Table Header -->
+    <div style="display: flex; font-weight: bold; padding: 6px 0; border-bottom: 2px solid #ccc;">
+        <div style="flex: 2;">Description</div>
+        <div style="flex: 1; text-align: right;">Quantity</div>
+        <div style="flex: 1; text-align: right;">Unit Price</div>
+        <div style="flex: 1; text-align: right;">Total</div>
+    </div>
+
+    <!-- Items -->
+    {% for item in quotation.items.all %}
+    <div style="display: flex; padding: 6px 0; border-bottom: 1px solid #eee;">
+        <div style="flex: 2;">{{ item.item.name }}</div>
+        <div style="flex: 1; text-align: right;">{{ item.quantity|floatformat:2 }}</div>
+        <div style="flex: 1; text-align: right;">{{ item.unit_price|floatformat:2 }}</div>
+        <div style="flex: 1; text-align: right;">{{ item.total|floatformat:2 }}</div>
+    </div>
+    {% empty %}
+    <div style="padding: 6px 0; text-align: center; color: #555;">
+        No items added
+    </div>
+    {% endfor %}
+
+    <!-- Totals -->
+    <div style="display: flex; justify-content: flex-end; margin-top: 8px; font-weight: bold;">
+        <div style="flex: 3; text-align: right; padding-right: 10px;">Total Amount:</div>
+        <div style="flex: 1; text-align: right;">{{ quotation.total_amount|floatformat:2 }}</div>
+    </div>
+    <div style="display: flex; justify-content: flex-end; margin-top: 2px;">
+        <div style="flex: 3; text-align: right; padding-right: 10px;">VAT ({{ quotation.vat_percentage }}%):</div>
+        <div style="flex: 1; text-align: right;">{{ quotation.vat_amount|floatformat:2 }}</div>
+    </div>
+    <div style="display: flex; justify-content: flex-end; margin-top: 4px; font-weight: bold; border-top: 2px solid #333; padding-top: 4px;">
+        <div style="flex: 3; text-align: right; padding-right: 10px;">Grand Total:</div>
+        <div style="flex: 1; text-align: right;">{{ quotation.grand_total|floatformat:2 }}</div>
+    </div>
+</div>
+
+<!-- Signatures -->
+<div class="signatures">
+    <div class="sign-block">Prepared By:<br><strong>{{ generated_by.get_full_name|default:generated_by.username }}</strong></div>
+    <div class="sign-block">Checked By:<br><br>__________________________</div>
+    <div class="sign-block">Approved By:<br><br>__________________________</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,333 @@
+{% load static %}
+{% load math_filters %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Payslip</title>
+
+<style>
+
+body{
+    font-family: Helvetica, Arial, sans-serif;
+    font-size:12px;
+    color:#000;
+    margin:30px;
+}
+
+/* HEADER */
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:35px;
+}
+
+.logo-section{
+    width:160px;
+    text-align:center;
+}
+
+.logo{
+    width:80px;
+}
+
+.tagline{
+    font-size:10px;
+    font-style:italic;
+    color:#666;
+    margin-top:6px;
+}
+
+.company-info{
+    flex:1;
+    line-height:1.6;
+    margin-left:10px;
+}
+
+.company-info strong{
+    font-size:13px;
+}
+
+.payslip-info{
+    width:200px;
+    text-align:right;
+}
+
+.payslip-title{
+    font-weight:bold;
+    font-size:14px;
+    margin-bottom:6px;
+}
+
+/* EMPLOYEE INFO */
+
+.info-card{
+    display:flex;
+    justify-content:space-between;
+    border:1px solid #ddd;
+    border-radius:8px;
+    padding:18px;
+    margin-bottom:25px;
+}
+
+.info-column{
+    width:48%;
+}
+
+.info-row{
+    display:flex;
+    justify-content:space-between;
+    padding:6px 0;
+    border-bottom:1px solid #eee;
+}
+
+.info-row:last-child{
+    border-bottom:none;
+}
+
+.label{
+    font-weight:bold;
+    color:#555;
+}
+
+.value{
+    color:#333;
+}
+
+/* SECTIONS */
+
+.section-title{
+    font-weight:bold;
+    border-bottom:1px dashed #888;
+    margin-bottom:8px;
+    padding-bottom:4px;
+}
+
+/* TABLES */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-bottom:15px;
+}
+
+th{
+    background:#f3f3f3;
+    padding:6px;
+    text-align:right;
+    font-size:11px;
+}
+
+th:first-child,
+td:first-child{
+    text-align:left;
+}
+
+td{
+    padding:6px;
+    border-bottom:1px solid #eee;
+}
+
+.right{
+    text-align:right;
+}
+
+.total{
+    font-weight:bold;
+    border-top:2px solid #333;
+}
+
+/* NET PAY */
+
+.net{
+    margin-top:10px;
+    border-top:2px solid #000;
+    padding-top:10px;
+    font-weight:bold;
+    display:flex;
+    justify-content:space-between;
+}
+
+/* FOOTER */
+
+.footer{
+    margin-top:30px;
+    text-align:center;
+    font-size:11px;
+    color:#777;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+
+<div class="logo-section">
+<img src="https://image2url.com/r2/default/images/1772914658173-c3b811fe-de04-4840-9a71-74c59ad4e855.png" class="logo">
+<div class="tagline">Professionally Delivering Excellence</div>
+</div>
+
+<div class="company-info">
+<strong>Texmon Logistics Limited</strong><br>
+Fidel Odinga Road off Nyali Links Road<br>
+P.O BOX 42627 80100<br>
+Contact: +254-795 616 827<br>
+Email: HR@texmonlogistics.co.ke
+</div>
+
+<div class="payslip-info">
+<div class="payslip-title">PAYSLIP</div>
+Payroll: {{ salary.employee.payroll }}<br><br>
+Date: {{ processed.date_processed|date:"d M Y" }}
+</div>
+
+</div>
+
+
+<!-- EMPLOYEE INFO -->
+
+<div class="info-card">
+
+<div class="info-column">
+
+<div class="info-row">
+<span class="label">Payslip Month</span>
+<span class="value">{{ processed.date_processed|date:"F Y" }}</span>
+</div>
+
+<div class="info-row">
+<span class="label">Employee Name</span>
+<span class="value">{{ salary.employee }}</span>
+</div>
+
+<div class="info-row">
+<span class="label">Designation</span>
+<span class="value">{{ salary.employee.designation }}</span>
+</div>
+
+</div>
+
+
+<div class="info-column">
+
+<div class="info-row">
+<span class="label">Payroll No</span>
+<span class="value">{{ salary.employee.payroll }}</span>
+</div>
+
+<div class="info-row">
+<span class="label">Pay Date</span>
+<span class="value">{{ processed.date_processed|date:"d M Y" }}</span>
+</div>
+
+<div class="info-row">
+<span class="label">Net Pay</span>
+<span class="value">{{ salary.net_salary|floatformat:2 }}</span>
+</div>
+
+</div>
+
+</div>
+
+
+<!-- EARNINGS -->
+
+<div class="section-title">EARNINGS</div>
+
+<table>
+
+<tr>
+<th>Description</th>
+<th>Amount</th>
+</tr>
+
+<tr>
+<td>Basic Salary</td>
+<td class="right">{{ salary.basic_salary|floatformat:2 }}</td>
+</tr>
+
+{% for allowance in salary.allowances.all %}
+<tr>
+<td>{{ allowance.name }}</td>
+<td class="right">
+{% if allowance.type == "percentage" %}
+{{ salary.basic_salary|percentage_of:allowance.amount|floatformat:2 }}
+{% else %}
+{{ allowance.amount|floatformat:2 }}
+{% endif %}
+</td>
+</tr>
+{% endfor %}
+
+<tr class="total">
+<td>Gross Earnings</td>
+<td class="right">{{ salary.gross_salary|floatformat:2 }}</td>
+</tr>
+
+</table>
+
+
+<!-- DEDUCTIONS -->
+
+<div class="section-title">DEDUCTIONS</div>
+
+<table>
+
+<tr>
+<th>Description</th>
+<th>Amount</th>
+</tr>
+
+{% for deduction in salary.deductions.all %}
+<tr>
+<td>{{ deduction.name }}</td>
+<td class="right">
+{% if deduction.type == "percentage" %}
+{{ salary.gross_salary|percentage_of:deduction.amount|floatformat:2 }}
+{% else %}
+{{ deduction.amount|floatformat:2 }}
+{% endif %}
+</td>
+</tr>
+{% endfor %}
+
+<tr class="total">
+<td>Total Deductions</td>
+<td class="right">{{ salary.total_deductions|floatformat:2 }}</td>
+</tr>
+
+</table>
+<div class="section-title"></div>
+
+<table>
+
+<tr>
+<th>Description</th>
+<th>Amount</th>
+</tr>
+<!-- TAX -->
+<tr>
+    <td>Tax (PAYE)</td>
+    <td class="right">{{ tax_amount|floatformat:2 }}</td>
+</tr>
+
+</table>
+<!-- NET PAY -->
+
+<div class="net">
+<span>Total Net Payable</span>
+<span>{{ salary.net_salary|floatformat:2 }}</span>
+</div>
+
+
+<div class="footer">
+This is a system-generated payslip and does not require a signature.
+</div>
+
+</body>
+</html>
