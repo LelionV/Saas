@@ -1,5 +1,237 @@
 {% load static %}
 <!DOCTYPE html>
+<<<<<<< HEAD
+<html lang="en">
+=======
+<<<<<<< HEAD
+<html>
+>>>>>>> 04d5579 (initial commit)
+<head>
+    <meta charset="UTF-8">
+    <title>Quotation {{ quotation.code }}</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            margin-bottom: 100px;
+            color: #333;
+            font-size: 13px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .logo {
+            width: 120px;
+        }
+
+        .company-details {
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .quotation-meta {
+            text-align: right;
+        }
+
+        h2 {
+            margin-bottom: 5px;
+        }
+
+        .section {
+            margin-top: 20px;
+        }
+
+        .box {
+            border: 1px solid #ccc;
+            padding: 12px;
+            width: 60%;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            font-size: 13px;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+
+        .totals {
+            width: 320px;
+            margin-left: auto;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 12px;
+            border-radius: 4px;
+        }
+
+        .totals div {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+        }
+
+        /* ✅ IMPROVED SIGNATURE SECTION */
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+            gap: 20px;
+        }
+
+        .sign-block {
+            width: 32%;
+            text-align: center;
+        }
+
+        .sign-title {
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+
+        .sign-line {
+            border-top: 1px solid #000;
+            margin: 0 auto 6px auto;
+            width: 80%;
+        }
+
+        .sign-name {
+            margin-top: 5px;
+            font-size: 12px;
+        }
+
+        .stamp {
+            margin-top: 10px;
+            border: 1px dashed #000;
+            padding: 10px;
+            display: inline-block;
+            font-size: 12px;
+        }
+
+        /* Footer */
+        .footer {
+            position: fixed;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div>
+        <img src="{{ logo_path }}" class="logo">
+        <p><strong>Professionally Delivering Excellence</strong></p>
+    </div>
+
+    <div class="company-details">
+        <strong>Texmon Logistics Limited</strong><br>
+        Fidel Odinga Road off Nyali Links Road<br>
+        P.O BOX 42627 80100<br>
+        Contact: +254-795 616 827<br>
+        Tax ID: P051812471I<br>
+        Email: enquiries@texmonlogistics.co.ke
+    </div>
+
+    <div class="quotation-meta">
+        <h2>Quotation</h2>
+        <p>#{{ quotation.code }}</p>
+        <p><strong>Ref No:</strong> {{ quotation.file|default:"N/A" }}</p>
+        <p><strong>Date:</strong> {{ quotation.created_at|date:"d/m/Y" }}</p>
+    </div>
+</div>
+
+<!-- BILL TO -->
+<div class="section">
+    <div class="box">
+        <strong>Bill To</strong><br>
+        {{ quotation.client.name }}<br>
+
+        {% if quotation.client.address %}
+            {{ quotation.client.address }}<br>
+        {% endif %}
+
+        {% if client_master %}
+            {% if client_master.PaymentTerm %}
+                <strong>Payment Term:</strong> {{ client_master.PaymentTerm }}<br>
+            {% endif %}
+            {% if client_master.Currency %}
+                <strong>Currency:</strong> {{ client_master.Currency }}<br>
+            {% endif %}
+            {% if client_master.Salesrep %}
+                <strong>Sales Rep:</strong> {{ client_master.Salesrep }}<br>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+<!-- ITEMS -->
+<table>
+    <tr>
+        <th>Description</th>
+        <th>Quantity</th>
+        <th>Unit Price</th>
+        <th>Total</th>
+    </tr>
+
+    {% for item in quotation.items.all %}
+    <tr>
+        <td>{{ item.item.name }}</td>
+        <td>{{ item.quantity|floatformat:2 }}</td>
+        <td>{{ item.unit_price|floatformat:2 }}</td>
+        <td>{{ item.total|floatformat:2 }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="4" style="text-align:center;">No items added</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- TOTALS -->
+<div class="totals">
+    <div>
+        <span>Total Amount:</span>
+        <span>{{ quotation.total_amount|floatformat:2 }}</span>
+    </div>
+    <div>
+        <span>VAT ({{ quotation.vat_percentage }}%):</span>
+        <span>{{ quotation.vat_amount|floatformat:2 }}</span>
+    </div>
+    <div>
+        <strong>Grand Total:</strong>
+        <strong>{{ quotation.grand_total|floatformat:2 }}</strong>
+    </div>
+</div>
+
+<!-- ✅ BEAUTIFIED SIGNATURES -->
+<div class="signatures">
+<<<<<<< HEAD
+=======
+    <div class="sign-block">Prepared By:<br><strong>{{ generated_by.get_full_name|default:generated_by.username }}</strong></div>
+    <div class="sign-block">Checked By:<br><br>__________________________</div>
+    <div class="sign-block">Approved By:<br><br>__________________________</div>
+=======
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -221,6 +453,7 @@
 
 <!-- ✅ BEAUTIFIED SIGNATURES -->
 <div class="signatures">
+>>>>>>> 04d5579 (initial commit)
 
     <div class="sign-block">
         <div class="sign-title">Prepared By</div>
@@ -250,6 +483,10 @@
 <!-- FOOTER -->
 <div class="footer">
     Texmon Logistics Limited: Professionally Delivering Excellence
+<<<<<<< HEAD
+=======
+>>>>>>> 1197327 (almost there)
+>>>>>>> 04d5579 (initial commit)
 </div>
 
 </body>

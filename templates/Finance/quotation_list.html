@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
 {% extends "admin/base_site.html" %}
 {% block content %}
 <h1>Quotations</h1>
@@ -21,4 +24,33 @@
     </tr>
     {% endfor %}
 </table>
+=======
+>>>>>>> 04d5579 (initial commit)
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h1>Quotations</h1>
+<table class="admin-table">
+    <tr>
+        <th>Code</th>
+        <th>Grand Total</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+    {% for row in data %}
+    <tr>
+        <td>{{ row.quotation.code }}</td>
+        <td>{{ row.quotation.grand_total }}</td>
+        <td>{{ row.status }}</td>
+        <td>
+            <a class="button" href="{{ row.action_url }}">
+                {% if row.invoice %}View Invoice{% else %}Create Invoice{% endif %}
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+<<<<<<< HEAD
+=======
+>>>>>>> 1197327 (almost there)
+>>>>>>> 04d5579 (initial commit)
 {% endblock %}
