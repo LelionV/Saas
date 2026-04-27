@@ -14,7 +14,6 @@ asn1crypto==1.5.1
 asttokens==3.0.0
 async-lru==2.0.4
 attrs==24.2.0
-audioop-lts==0.2.1
 autocommand==2.2.2
 autograd==1.7.0
 autograd-gamma==0.5.0
