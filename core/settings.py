@@ -31,7 +31,7 @@ ALLOWED_HOSTS = ['*','StackMate.pythonanywhere.com']
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin',
+    # 'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -76,29 +76,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-JAZZMIN_SETTINGS = {
-    "site_title": "Texmon",
-    "site_header": "ERP",
-    "site_brand": "Texmon",
-    "welcome_sign": "Welcome to the Admin Panel",
+# JAZZMIN_SETTINGS = {
+#     "site_title": "Texmon",
+#     "site_header": "ERP",
+#     "site_brand": "Texmon",
+#     "welcome_sign": "Welcome to the Admin Panel",
 
-    # Top menu
-    "topmenu_links": [
-        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"name": "View Site", "url": "/", "new_window": True},
-    ],
+#     # Top menu
+#     "topmenu_links": [
+#         {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+#         {"name": "View Site", "url": "/", "new_window": True},
+#     ],
 
-    # Sidebar
-    "show_sidebar": True,
-    "navigation_expanded": True,
+#     # Sidebar
+#     "show_sidebar": True,
+#     "navigation_expanded": True,
 
-    # Icons (FontAwesome)
-    "icons": {
-        "auth": "fas fa-users-cog",
-        "auth.user": "fas fa-user",
-        "auth.Group": "fas fa-users",
-    } # tabs / single / collapsible
-}
+#     # Icons (FontAwesome)
+#     "icons": {
+#         "auth": "fas fa-users-cog",
+#         "auth.user": "fas fa-user",
+#         "auth.Group": "fas fa-users",
+#     } # tabs / single / collapsible
+# }
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
