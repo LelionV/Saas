@@ -8,7 +8,6 @@ from django.http import HttpResponseRedirect,HttpResponse  # ✅ Both included!
 from django.utils.html import format_html
 from django.template.loader import render_to_string
 from django.utils import timezone
-from weasyprint import HTML
 
 from .models import Invoice, InvoiceItem, InvoicePayment, Receipt, QuotationForFinance,Expense,SupplierPayment, StatementReport, StatementLine
 from MasterData.models import ClientMasterData, Account
@@ -293,6 +292,8 @@ class InvoiceAdmin(admin.ModelAdmin):
     # Generate PDF View
     # -----------------------------
     def generate_pdf_view(self, request, invoice_id):
+        from weasyprint import HTML
+        
         invoice = Invoice.objects.get(pk=invoice_id)
 
         client_master = (
@@ -414,6 +415,7 @@ class StatementReportAdmin(admin.ModelAdmin):
     # ACTION: Download PDF
     # -------------------------------------------------
     def download_pdf(self, request, queryset):
+        from weasyprint import HTML
 
         # Only allow one selection for PDF
         if queryset.count() != 1:
