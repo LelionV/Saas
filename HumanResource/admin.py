@@ -80,7 +80,7 @@ from django.utils import timezone
 from io import BytesIO
 from django.core.files.base import ContentFile
 from django.template.loader import render_to_string
-from weasyprint import HTML
+
 
 from .models import ProcessedSalary, SalaryStructure
 from .utils import send_payslip_email
@@ -131,6 +131,7 @@ class ProcessedSalaryAdmin(admin.ModelAdmin):
         return custom_urls + urls
 
     def process_current_month(self, request):
+        from weasyprint import HTML
 
         today = timezone.now().date()
         current_month = today.month
