@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice {{ invoice.code }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin:40px; font-size:13px; color:#333; }
+        .header { display:flex; justify-content:space-between; }
+        .logo { width:120px; }
+        .company-details { font-size:13px; line-height:1.6; }
+        .quotation-meta { text-align:right; }
+        h2 { margin-bottom:5px; }
+        .section { margin-top:20px; }
+        .box { border:1px solid #ccc; padding:10px; width:60%; }
+        table { width:100%; border-collapse:collapse; margin-top:15px; }
+        table th, table td { border:1px solid #ccc; padding:8px; text-align:center; font-size:13px; }
+        table th { background-color:#f2f2f2; }
+        .totals { width:320px; margin-left:auto; margin-top:20px; border:1px solid #ccc; padding:10px; }
+        .totals div { display:flex; justify-content:space-between; margin:5px 0; }
+        .signatures { display:flex; justify-content:space-between; margin-top:30px; }
+        .stamp { margin-top:10px; border:1px dashed #000; padding:10px; font-size:12px; text-align:center; }
+         .footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                text-align: center;
+                font-size: 12px;
+            }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+    <div>
+        <img src="{{ logo_path }}" class="logo">
+    </div>
+    <div class="company-details">
+        <strong>Texmon Logistics Limited</strong><br>
+        Fidel Odinga Road off Nyali Links Road<br>
+        P.O BOX 42627 80100<br>
+        Contact: +254-795 616 827<br>
+        Tax ID: P051812471I<br>
+        Email: enquiries@texmonlogistics.co.ke
+    </div>
+    <div class="quotation-meta">
+        <h2>Invoice</h2>
+        <p>#{{ invoice.code }}</p>
+        <p><strong>Ref No:</strong> {% if invoice.quotation.file %}{{ invoice.quotation.file }}{% else %}N/A{% endif %}</p>
+        <p><strong>Date:</strong> {{ invoice.date_created|date:"d/m/Y" }}</p>
+    </div>
+</div>
+
+<!-- BILL TO -->
+<div class="section">
+    <div class="box">
+        <strong>Bill To</strong><br>
+        {{ invoice.quotation.client.name }}<br>
+        {% if invoice.quotation.client.address %}
+            {{ invoice.quotation.client.address }}<br>
+        {% endif %}
+        {% with master=invoice.quotation.client.clientmasterdata_set.last %}
+            {% if master %}
+                {% if master.PaymentTerm %}
+                    <strong>Payment Term:</strong> {{ master.PaymentTerm.name }}<br>
+                {% endif %}
+                {% if master.Currency %}
+                    <strong>Currency:</strong> {{ master.Currency.name }}<br>
+                {% endif %}
+                {% if master.Salesrep %}
+                    <strong>Sales Rep:</strong> {{ master.Salesrep }}<br>
+                {% endif %}
+            {% endif %}
+        {% endwith %}
+    </div>
+</div>
+
+<!-- TOP TABLE: POL / POD / FPOD -->
+<div class="section">
+    <table>
+        <tr>
+            <th>POL</th>
+            <th>POD</th>
+            <th>FPOD</th>
+        </tr>
+        <tr>
+            <td>
+                {% if invoice.quotation.pol %}
+                    {{ invoice.quotation.pol.name }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+
+            <td>
+                {% if invoice.quotation.pod %}
+                    {{ invoice.quotation.pod.name }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+
+            <td>
+                {% if invoice.quotation.fpod %}
+                    {{ invoice.quotation.fpod.name }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- BOTTOM TABLE: Description / Quantity / Unit Price / Total -->
+<div class="section">
+    <table>
+        <tr>
+            <th>Description</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Total</th>
+        </tr>
+        {% for item in invoice.items.all %}
+        <tr>
+            <td>
+                {% if item.item.description %}
+                    {{ item.item.description }}
+                {% else %}
+                    {{ item.item.item.name }}
+                {% endif %}
+            </td>
+            <td>{{ item.quantity|floatformat:2 }}</td>
+            <td>{{ item.unit_price|floatformat:2 }}</td>
+            <td>{{ item.total_amount|floatformat:2 }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" style="text-align:center;">No items added</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<!-- TOTALS -->
+<div class="totals">
+    <div><span>Total Amount:</span><span>{{ invoice.total_amount|floatformat:2 }}</span></div>
+    <div><span>VAT ({{ invoice.quotation.vat_percentage }}%):</span><span>{{ invoice.vat_amount|floatformat:2 }}</span></div>
+    <div><strong>Grand Total:</strong><strong>{{ invoice.grand_total|floatformat:2 }}</strong></div>
+</div>
+
+<!-- BANK DETAILS -->
+<div class="section">
+    <strong>Bank Details</strong>
+
+    <div style="display:flex; gap:10px; margin-top:10px;">
+        {% for account in accounts %}
+        <div style="flex:1; border:1px solid #ccc; padding:10px;">
+            <p><strong>Bank:</strong> {{ account.bank_name }}</p>
+            <p><strong>Branch:</strong> {{ account.branch }}</p>
+            <p><strong>Account No:</strong> {{ account.account_number }}</p>
+            <p><strong>Currency:</strong> {{ account.currency.name }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- SIGNATURES -->
+<div class="signatures">
+    <div>Prepared By:<br>{{ generated_by.get_full_name|default:generated_by.username }}</div>
+    <div>Checked By:<br>____________________</div>
+    <div>Approved By:<br>____________________
+        <div class="stamp">TEXMON LOGISTICS LIMITED<br>MOMBASA, KENYA</div>
+    </div>
+</div>
+
+<div class="footer">Texmon Logistics Limited: Professionally Delivering Excellence</div>
+</body>
+</html>

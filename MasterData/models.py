@@ -84,6 +84,7 @@ class Transport(models.Model):
 
 class File(models.Model):
     name = models.CharField(max_length=255)
+    reference = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
@@ -96,3 +97,17 @@ class Item(models.Model):
     def __str__(self):
         return self.name
 
+class Account(models.Model):
+    bank_name = models.CharField(max_length=120, help_text="Bank Name")
+    branch = models.CharField(max_length=120, help_text="Branch Name")
+    currency = models.ForeignKey(Currency, on_delete=models.CASCADE, help_text="Currency for the account")
+    account_number = models.CharField(
+        max_length=20,
+        unique=True,
+        validators=[RegexValidator(r'^\d+$', message='Account number must be numeric')],
+        help_text="Bank Account Number"
+    )
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.bank_name} - {self.account_number}"

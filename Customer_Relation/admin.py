@@ -1,3 +1,5 @@
+import os
+from django.conf import settings
 from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
@@ -27,7 +29,7 @@ class QuotationAdmin(admin.ModelAdmin):
 
     # Default readonly fields
     readonly_fields = (
-        'code', 'grand_total', 'copy_code_button', 'pdf_button', 
+        'code', 'grand_total', 'copy_code_button', 'pdf_button',
         'total_amount', 'vat_amount',
         'payment_term', 'client_currency', 'sales_rep'
     )
@@ -151,6 +153,7 @@ class QuotationAdmin(admin.ModelAdmin):
     def generate_pdf_view(self, request, quotation_id):
         quotation = self.get_object(request, quotation_id)
         client_master = None
+        logo_path = os.path.join(settings.BASE_DIR, "static", "images", "logo.png")
         if quotation.client:
             client_master = ClientMasterData.objects.filter(Client=quotation.client).last()
         context = {
@@ -159,9 +162,13 @@ class QuotationAdmin(admin.ModelAdmin):
             "generated_by": request.user,
             "generated_at": timezone.now(),
             "signed_by": "-",
+            "logo_path": f"file://{logo_path}",
         }
         html_string = render_to_string("Customer_Relation/quotation_pdf.html", context)
-        html = HTML(string=html_string)
+        html = HTML(
+            string=html_string,
+            base_url=request.build_absolute_uri("/")
+            )
         pdf_file = html.write_pdf()
         response = HttpResponse(pdf_file, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename=Quotation-{quotation.code}.pdf'

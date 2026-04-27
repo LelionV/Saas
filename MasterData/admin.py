@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Client, Port, Supplier, Salesrep, Currency, PaymentTerm, ClientMasterData, File, Transport, Item
+from .models import Client, Port, Supplier, Salesrep, Currency, PaymentTerm, ClientMasterData, File, Transport, Item, Account
 
 
 class ClientAdmin(admin.ModelAdmin):
@@ -33,9 +33,9 @@ class PaymentTermAdmin(admin.ModelAdmin):
     search_fields = ('name', 'days', 'description', 'is_active')
 
 class FileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'is_active')
-    list_filter = ('name', 'is_active')
-    search_fields = ('name', 'is_active')
+    list_display = ('name', 'reference', 'is_active')
+    list_filter = ('name', 'reference', 'is_active')
+    search_fields = ('name', 'reference', 'is_active')
 
 class TransportAdmin(admin.ModelAdmin):
     list_display = ('name', 'is_active')
@@ -53,7 +53,13 @@ class ClientMasterDataAdmin(admin.ModelAdmin):
     list_filter = ('Client', 'PaymentTerm', 'Currency', 'Salesrep', 'updated_at')
     search_fields = ('Client', 'PaymentTerm', 'Currency', 'Salesrep', 'updated_at')
 
+class AccountAdmin(admin.ModelAdmin):
+    list_display = ('bank_name', 'branch', 'account_number', 'currency', 'is_active')
+    list_filter = ('currency', 'is_active')
+    search_fields = ('bank_name', 'branch', 'account_number')
+    ordering = ('bank_name',)
 
+admin.site.register(Account, AccountAdmin)
 admin.site.register(Client, ClientAdmin)
 admin.site.register(Port, PortAdmin)
 admin.site.register(Supplier, SupplierAdmin)

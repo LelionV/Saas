@@ -365,3 +365,180 @@ class QuotationForFinance(Quotation):
         proxy = True
         verbose_name = "Quotation (Finance)"
         verbose_name_plural = "Quotations (Finance)"
+
+
+class Expense(models.Model):
+
+    STATUS = (
+        ("unpaid", "Unpaid"),
+        ("partial", "Partially Paid"),
+        ("paid", "Paid"),
+    )
+
+    quotation = models.ForeignKey(
+        Quotation,
+        on_delete=models.CASCADE,
+        related_name="expenses"
+    )
+
+    supplier = models.ForeignKey(
+        "MasterData.Supplier",
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+    expense_type = models.ForeignKey(
+        "MasterData.Item",
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+
+    amount_paid = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
+
+    status = models.CharField(max_length=20, choices=STATUS, default="unpaid")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def balance(self):
+        return self.amount - self.amount_paid
+
+    def update_status(self):
+        if self.amount_paid == 0:
+            self.status = "unpaid"
+        elif self.amount_paid < self.amount:
+            self.status = "partial"
+        else:
+            self.status = "paid"
+
+    def _str_(self):
+        return f"{self.supplier} - {self.amount}"
+
+class SupplierPayment(models.Model):
+
+    expense = models.ForeignKey(
+        Expense,
+        related_name="payments",
+        on_delete=models.CASCADE
+    )
+
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+
+    payment_date = models.DateField(default=timezone.now)
+
+    reference = models.CharField(max_length=100, blank=True)
+
+    def save(self, *args, **kwargs):
+
+        super().save(*args, **kwargs)
+
+        expense = self.expense
+
+        total_paid = expense.payments.aggregate(
+            total=Sum("amount")
+        )["total"] or Decimal("0.00")
+
+        expense.amount_paid = total_paid
+        expense.update_status()
+
+        Expense.objects.filter(id=expense.id).update(
+            amount_paid=expense.amount_paid,
+            status=expense.status
+        )
+class StatementReport(models.Model):
+
+    STATEMENT_TYPE = (
+        ("customer", "Customer"),
+        ("supplier", "Supplier"),
+    )
+
+    client = models.ForeignKey(
+        "MasterData.Client",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
+    statement_type = models.CharField(max_length=20, choices=STATEMENT_TYPE)
+
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+
+    opening_balance = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    closing_balance = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    # 🔥 MAIN GENERATION METHOD
+    def generate(self):
+
+        from .models import Invoice, StatementLine
+
+        # clear existing lines (important when regenerating)
+        self.lines.all().delete()
+
+        balance = self.opening_balance or Decimal("0.00")
+
+        invoices = Invoice.objects.filter(
+            quotation__client=self.client
+        )
+
+        if self.start_date and self.end_date:
+            invoices = invoices.filter(
+                date_created__range=(self.start_date, self.end_date)
+            )
+
+        invoices = invoices.order_by("date_created")
+
+        for inv in invoices:
+
+            # Debit (Invoice)
+            balance += inv.grand_total
+
+            StatementLine.objects.create(
+                statement=self,
+                date=inv.date_created,
+                description=f"Invoice {inv.code}",
+                debit=inv.grand_total,
+                credit=Decimal("0.00"),
+                balance=balance
+            )
+
+            # Credit (Payments)
+            for pay in inv.payments.all().order_by("payment_date"):
+
+                balance -= pay.amount
+
+                StatementLine.objects.create(
+                    statement=self,
+                    date=pay.payment_date,
+                    description=f"Payment ({pay.payment_method})",
+                    debit=Decimal("0.00"),
+                    credit=pay.amount,
+                    balance=balance
+                )
+
+        self.closing_balance = balance
+        self.save()
+
+    def __str__(self):
+        return f"Statement - {self.client} ({self.start_date} to {self.end_date})"
+class StatementLine(models.Model):
+
+    statement = models.ForeignKey(
+        StatementReport,
+        related_name="lines",
+        on_delete=models.CASCADE
+    )
+
+    date = models.DateField()
+    description = models.CharField(max_length=255)
+
+    debit = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    credit = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+
+    balance = models.DecimalField(max_digits=12, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.date} - {self.description}"

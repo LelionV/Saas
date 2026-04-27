@@ -23,19 +23,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-c!jma@+f9*o4-o!4d@ll)&gh^+9vc5*nasfqqm^eh5+st=c$u1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*', '10.120.45.126', '127.0.0.1']
+ALLOWED_HOSTS = ['*','StackMate.pythonanywhere.com']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    "jazzmin", 
-    # "unfold",                
-    # "unfold.contrib.filters",  
-    # "unfold.contrib.forms",
-    # 'jet',
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -61,35 +57,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 
-JAZZMIN_SETTINGS = {
-    "site_title": "My Admin",
-    "site_header": "My Admin Panel",
-    "site_brand": "Texmon",
-    "welcome_sign": "Welcome to My Admin",
-    "show_sidebar": True,
-    "navigation_expanded": True,
-    "order_with_respect_to": ["auth", "myapp"],
-    "icons": {
-        "auth": "fas fa-users-cog",         
-        "myapp": "fas fa-rocket",           
-        "myapp.mymodel": "fas fa-star",
-    },
-}
-
-# Jazzmin UI tweaks (optional)
-JAZZMIN_UI_TWEAKS = {
-    "navbar_small_text": False,
-    "footer_small_text": True,
-    "body_small_text": False,
-    "brand_color": "bg-primary",
-    "accent": "accent-primary",
-    "button_classes": "btn-primary",
-}
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'], 
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -104,26 +76,49 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+JAZZMIN_SETTINGS = {
+    "site_title": "Texmon",
+    "site_header": "ERP",
+    "site_brand": "Texmon",
+    "welcome_sign": "Welcome to the Admin Panel",
+
+    # Top menu
+    "topmenu_links": [
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "View Site", "url": "/", "new_window": True},
+    ],
+
+    # Sidebar
+    "show_sidebar": True,
+    "navigation_expanded": True,
+
+    # Icons (FontAwesome)
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+    } # tabs / single / collapsible
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'logistics',
-        'USER': 'root',
-        'PASSWORD': 'Root@8998Secure!',
-        'HOST': 'localhost',
-        'PORT': '3306'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'logistics',
+#         'USER': 'root',
+#         'PASSWORD': 'Root@8998Secure!',
+#         'HOST': 'localhost',
+#         'PORT': '3306'
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -149,7 +144,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Nairobi'
 
 USE_I18N = True
 
@@ -159,7 +154,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
@@ -168,11 +163,3 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'liamleli44@gmail.com'
-EMAIL_HOST_PASSWORD = 'amrxexweohfqqrmw'
-DEFAULT_FROM_EMAIL = 'Payroll <liamleli44@gmail.com>'
